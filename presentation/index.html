@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Securing a WebAPI</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/league.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<style>
+			img {
+				border-radius: 35px;
+				box-shadow: 6px 20px 25px #FFFFFF;
+			}
+			.container{
+					display: flex;
+			}
+			.col{
+					flex: 1;
+			}
+
+			ul li {
+				font-size: smaller;
+			}
+			ul.no-bullets {
+				list-style: none;
+			}
+
+			.text-bold {
+				font-weight: bold;
+				color: #f0db4f;
+			}
+
+			.color1 {
+				color: #f0db4f !important;
+			}
+			.color2 {
+				color: #61dbfb !important;
+			}
+			.color3 {
+				color: #42b883 !important;
+			}
+
+
+		</style>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1 class="r-fit-text">Securing a WebAPI with JWT Role-Based Authentication</h1>
+					<small>&copy; 2022 - A GitFetchVictor Production</small>
+				</section>
+				<section>
+					<h2>Victor J. Pudelski</h2>
+					<h5>
+						V.P. of Development - ZubiSoft, LLC <br />
+						Founder/Developer - Next Link Software, LLC
+					</h5>
+					<div class="container">
+						<div class="col">
+							<ul>
+								<li>Developer since 1999</li>
+								<li>Worked with AngularJS, Vue, jQuery, Bootstrap</li>
+								<li>Played with React, Knockout</li>
+							</ul>
+							<p>A couple fun facts</p>
+							<ul>
+								<li>I live near Cleveland, OH</li>
+								<li>I still call them the Indians!</li>
+								<li>I coach HS Girls Softball</li>
+							</ul>
+						</div>
+						<div class="col">
+							<img src="./images/photo.png" />
+						</div>
+					</div>
+				</section>
+				<section>
+					<h2>Description</h2>
+					<small>
+						<p>
+							Setting up a database table to store user information and have a webAPI method to login is just 
+							the beginning. Once a user is logged in you need to return a token for subsequent calls, and 
+							store that somewhere so the user doesn’t have to constantly pass their username and password. 
+							The database can store user roles and rights allowing the user access to only certain calls or 
+							privileges. This course takes a simple view at doing this from scratch with a simple SQL database, 
+							.NET WebAPI and an HTML front end. We will also look at testing our WebAPI in Postman. By the end 
+							of the course a base security scheme can be achieved and further built upon.
+						</p>
+					</small>
+				</section>
+				<section>
+					<h2>Translation</h2>
+					<small>
+						<p>
+							We are adding Authentication and Authorization to our website using JWT
+						</p>
+					</small>
+				</section>
+				<section>
+					<h2>What's JWT?</h2>
+					<p>
+						JWT stands for JSON Web Token and they are an open, industry standard 
+						<a href="https://www.rfc-editor.org/rfc/rfc7519" target="_blank">RFC 7519</a> method representing
+						claims securely between two parties.
+					</p>
+					<small>Definition from <a href="https://jwt.io" target="_blank">jwt.io</a></small>
+				</section>
+				<section>
+					<h2>WAIT A MINUTE!...</h2>
+					<p>I have heard JWT is not secure...</p>
+					<p>I heard you shouldn't use it...</p>
+					<small>I've heard that too...</small>
+				</section>
+				<section>
+					<h2>JWT Truth</h2>
+					<p>
+						Like a lot of things, it's all about the implementation and making sure you take the proper 
+						steps to make it secure... For instance, Don't:
+					</p>
+					<ul class="no-bullets">
+						<li>Forget to encrypt the package...</li>
+						<li>Use HTTP, force HTTPS</li>
+						<li>Expose keys</li>
+						<li>Etc.</li>
+					</p>
+				</section>
+				<section>
+					<h2>What Does a JWT Look Like?</h2>
+					<p>
+						eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiIw
+						IiwiVXNlck5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsIm5iZ
+						iI6MTY2NjA1ODE1MiwiZXhwIjoxNjY2MDU5OTUyLCJpYXQi
+						OjE2NjYwNTgxNTIsImlzcyI6IkluZHlDb2RlMjAyMiIsImF1ZCI6
+						IkluZHlDb2RlMjAyMiJ9._ADGpXa-ueDjtMqxxoac2c1iFodLvqz0K-QVy0K9tfw
+					</p>
+				</section>
+				<section data-transition="none">
+					<h2>Any Questions?... </h2>
+					<p>
+						eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiIw
+						IiwiVXNlck5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsIm5iZ
+						iI6MTY2NjA1ODE1MiwiZXhwIjoxNjY2MDU5OTUyLCJpYXQi
+						OjE2NjYwNTgxNTIsImlzcyI6IkluZHlDb2RlMjAyMiIsImF1ZCI6
+						IkluZHlDb2RlMjAyMiJ9._ADGpXa-ueDjtMqxxoac2c1iFodLvqz0K-QVy0K9tfw
+					</p>
+				</section>
+				<section>
+					<h2>JWT Structure</h2>
+					<ul class="no-bullets">
+						<li><span class="text-bold">Header</span> - specifies the algorithm and the type of token (JWT)</li>
+						<li><span class="text-bold">Payload</span> - The Claims of information of the JSON object</li>
+						<li><span class="text-bold">Signature</span> - A cryptographic signature to validate the integrity of the payload</li>
+					</ul>
+				</section>
+				<section>
+					<h2>JWT Structure</h2>
+					<img src="./images/jwt-structure.png">
+				</section>
+				<section data-auto-animate>
+					<h2>JWT One More Time!</h2>
+					<p>
+						<span>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span>.<span>eyJVc2VySUQiOiIw
+						IiwiVXNlck5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsIm5iZ
+						iI6MTY2NjA1ODE1MiwiZXhwIjoxNjY2MDU5OTUyLCJpYXQi
+						OjE2NjYwNTgxNTIsImlzcyI6IkluZHlDb2RlMjAyMiIsImF1ZCI6
+						IkluZHlDb2RlMjAyMiJ9</span>.<span>_ADGpXa-ueDjtMqxxoac2c1iFodLvqz0K-QVy0K9tfw</span>
+					</p>
+				</section>
+				<section data-auto-animate>
+					<h2 class="color1">Header</h2>
+					<p>
+						<span class="color1">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span>.<span>eyJVc2VySUQiOiIw
+						IiwiVXNlck5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsIm5iZ
+						iI6MTY2NjA1ODE1MiwiZXhwIjoxNjY2MDU5OTUyLCJpYXQi
+						OjE2NjYwNTgxNTIsImlzcyI6IkluZHlDb2RlMjAyMiIsImF1ZCI6
+						IkluZHlDb2RlMjAyMiJ9</span>.<span>_ADGpXa-ueDjtMqxxoac2c1iFodLvqz0K-QVy0K9tfw</span>
+					</p>
+				</section>
+				<section data-auto-animate>
+					<h2 class="color2">Payload</h2>
+					<p>
+						<span class="color1">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span>.<span class="color2">eyJVc2VySUQiOiIw
+						IiwiVXNlck5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsIm5iZ
+						iI6MTY2NjA1ODE1MiwiZXhwIjoxNjY2MDU5OTUyLCJpYXQi
+						OjE2NjYwNTgxNTIsImlzcyI6IkluZHlDb2RlMjAyMiIsImF1ZCI6
+						IkluZHlDb2RlMjAyMiJ9</span>.<span>_ADGpXa-ueDjtMqxxoac2c1iFodLvqz0K-QVy0K9tfw</span>
+					</p>
+				</section>
+				<section data-auto-animate>
+					<h2 class="color3">Signature</h2>
+					<p>
+						<span class="color1">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span>.<span class="color2">eyJVc2VySUQiOiIw
+						IiwiVXNlck5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsIm5iZ
+						iI6MTY2NjA1ODE1MiwiZXhwIjoxNjY2MDU5OTUyLCJpYXQi
+						OjE2NjYwNTgxNTIsImlzcyI6IkluZHlDb2RlMjAyMiIsImF1ZCI6
+						IkluZHlDb2RlMjAyMiJ9</span>.<span class="color3">_ADGpXa-ueDjtMqxxoac2c1iFodLvqz0K-QVy0K9tfw</span>
+					</p>
+				</section>
+				<section>
+					<h2>So, How Do We Implement This?</h2>
+					<ul>
+						<li>Need somewhere to store or retrieve user credentials from</li>
+						<li>Need to expose those credentials through a WebAPI</li>
+						<li>Need to implement a front-end that checks for logins, rights, etc</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Let's jump into some code...</h2>
+				</section>
+				<section>
+					<h2>How can we improve this?</h2>
+					<ul>
+						<li>Add Refresh Tokens</li>
+						<li>Move the Token to Cookies</li>
+						<li>What about a better database?</li>
+						<li>What about logic with redirects when sent to login</li>
+						<li>What else can you think of?</li>
+					</ul>
+				</section>
+				<section>
+					<h1>THANK YOU!</h1>
+					<h2>Any Questions?</h2>
+					<hr/>
+					<h4>Victor J. Pudelski</h4>
+					<small>
+						<span class="fa fa-envelope"> vjpudelski@gmail.com</span><br />
+						<span class="fab fa-twitter"> @vjpudelski</span><br />
+						<span class="fa fa-globe"> gitfetchvictor.com</span>
+					</small>
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
