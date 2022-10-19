@@ -578,6 +578,8 @@ Now you can launch the application and go to either of the following URLs to ver
 This file will wrap the fetch API method. The purpose is to provide an easy to use interface for 
 calling webAPI methods. 
 
+Make sure the port number is the correct port for the url
+
 ```javascript
 // path to the WebAPI facilitating the calls.
 let url = 'https://localhost:7182';
